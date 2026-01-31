@@ -1,5 +1,7 @@
 
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
 
 import LoginPage from "../pages/Login.jsx";
 import NotFound from "../pages/NotFound.jsx";
@@ -11,7 +13,8 @@ import SessionGuard from "./SessionGuard.jsx";
 import AuthAdmin from "./AuthAdmin.jsx";
 
 import RegisterHotel from "../pages/Admin/components/RegisterHotel.jsx";
-import ListHotel from "../pages/Admin/components/ListHotel.jsx";
+import Hotels from "../pages/Admin/components/Hotels.jsx"
+import LayoutAdmin from "../pages/Admin/index.jsx";
 function RouterPages() {
     return (
         <BrowserRouter>
@@ -21,19 +24,18 @@ function RouterPages() {
                 <Route path="/" element={<HomePage />} />
             //? Protected Routes
                
-                <Route
+                <Route element={<AuthAdmin></AuthAdmin>}>
+                <Route           
                     path="/dashboard"
-                    element={
-                     <AuthAdmin></AuthAdmin>
-                    }
-                >
-                    //?  = /dashboard/registrohotel
-                    <Route path="registrohotel" element={<RegisterHotel/>}/>
-                    
-                    //? = /dashboard/gestionhoteles
-                    <Route path="gestionhoteles" element={<ListHotel/>}/>
+                    element={<LayoutAdmin></LayoutAdmin>}
 
+                >
+                    <Route path="registrohotel" element={<RegisterHotel />} />
+                    <Route path="gestionhoteles" element={<Hotels />} />
                 </Route>
+            </Route>
+
+                
 
                 {/* <Route path="/dashboard/registrohotel" element={<AuthAdmin> <RegisterHotel /> </AuthAdmin>} />
                 <Route path="/dashboard/gestionhoteles" element={<AuthAdmin> <ListHotel /> </AuthAdmin>} /> */}

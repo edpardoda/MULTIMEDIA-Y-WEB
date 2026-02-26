@@ -12,54 +12,52 @@ import IconButton from '@mui/material/IconButton';
 import { useNavigate } from 'react-router-dom';
 import ModalMui from '../components/ModalMui.jsx';
 
+import { Services } from '../services/service.js';
+import config from '../configs/env.js';
+
 import { setDataUser, rmDataUser } from '../storages/user.model.jsx';
 
-
 function LoginPage() {
-
 
     const navigate = useNavigate();
     const [user, setUser] = useState("");
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
 
-
-    const [stateModal, setStateModal] = useState(
-        {
-            open: false,
-            title: "Titulo Modal",
-            message: "Este es el mensaje del modal",
-            status: "info",
-
-        }
-    );
+    const [stateModal, setStateModal] = useState({
+        open: false,
+        title: "Titulo Modal",
+        message: "Este es el mensaje del modal",
+        status: "info",
+    });
 
     const handleCloseModal = () => {
         setStateModal({ ...stateModal, open: false });
     }
 
-    const handleSendForm = () => {
-        const resLogin = LoginService(user, password);
-        if (resLogin == null) {
+    const handleSendForm = async () => {
+        const resLogin = await Services(
+            { username: user, password: password },   // body
+            config.api.login.authenticate.url,       // url
+            config.api.login.authenticate.method    // method, opcional
+        );
+
+        if (resLogin.status) {
             setStateModal(
                 {
-                    open: true,
-                    title: "Error de autenticacion",
-                    message: "Las credenciales ingresadas son incorrectas.",
-                    status: "error"
-                }
-            )
+                open: true,
+                title: "Error de autenticacion",
+                status: 'error',
+                message: resLogin.message,
+            });
             return;
-        } 
-        setDataUser(resLogin);
+        }
 
-        navigateUser(resLogin?.role)
-      
-        
+        setDataUser(resLogin);
+        navigateUser(resLogin?.role);
     }
 
-    const navigateUser = (role)=>{
-
+    const navigateUser = (role) => {
         switch (role) {
             case 'admin':
                 navigate('/dashboard/gestionhoteles');
@@ -67,18 +65,15 @@ function LoginPage() {
             default:
                 break;
         }
-
     }
 
     const handleRegister = () => {
         navigate('/registro');
     }
-    useEffect(
-        () => {
-            rmDataUser();
-        },
-        []
-    );
+
+    useEffect(() => {
+        rmDataUser();
+    }, []);
 
     return (
         <>
@@ -87,7 +82,8 @@ function LoginPage() {
                 title={stateModal.title}
                 message={stateModal.message}
                 status={stateModal.status}
-                handleClose={handleCloseModal} />
+                handleClose={handleCloseModal} 
+            />
 
             <Box sx={{ flexGrow: 1 }}>
                 <Grid container spacing={2} direction="column" alignItems="center" justifyContent="center">
@@ -101,12 +97,8 @@ function LoginPage() {
                             e.preventDefault();
                             handleSendForm();
                         }}>
-                            <Grid container
-                                spacing={2}
-
-                                alignItems="center"
-                                justifyContent="center"
-                            >
+                            <Grid container spacing={2} alignItems="center" justifyContent="center">
+                                
                                 <Grid size={12}>
                                     <InputMui
                                         startIcon={<PersonIcon />}
@@ -114,8 +106,10 @@ function LoginPage() {
                                         label="Nombre de Usuario"
                                         value={user}
                                         onChange={(e) => { setUser(e.target.value) }}
-                                        required />
+                                        required
+                                    />
                                 </Grid>
+
                                 <Grid size={12}>
                                     <InputMui
                                         endIcon={
@@ -131,22 +125,27 @@ function LoginPage() {
                                         onChange={(e) => { setPassword(e.target.value) }}
                                     />
                                 </Grid>
+
                                 <Grid size={6}>
                                     <ButtonMui name={`Ingresar`} backgroundColor='red' />
                                 </Grid>
-                                <Grid size={6}>
 
-                                    <ButtonMui type='button' onClick={handleRegister} name={`Registrarse`} backgroundColor='blue' />
+                                <Grid size={6}>
+                                    <ButtonMui 
+                                        type='button' 
+                                        onClick={handleRegister} 
+                                        name={`Registrarse`} 
+                                        backgroundColor='blue' 
+                                    />
                                 </Grid>
+
                             </Grid>
                         </form>
                     </Grid>
                 </Grid>
-
             </Box>
-
         </>
     )
 }
 
-export default LoginPage
+export default LoginPage;

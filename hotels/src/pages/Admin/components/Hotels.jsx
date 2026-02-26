@@ -5,6 +5,9 @@ import { useEffect, useState } from 'react';
 import { columsHotels } from '../../../utils/columnsTable'
 import { GetHotels } from '../../../utils/hotels';
 import ModalMui from '../../../components/ModalMui';
+
+import { Services } from '../../../services/service.js';
+import config from '../../../configs/env.js';
 function Hotels ({}) { 
 
     const [listHotels, setListHotels] = useState([]);
@@ -15,9 +18,16 @@ function Hotels ({}) {
         status: 'info'
     })
 
-    const handleGetHotels = () =>{
-        const hotels = GetHotels();
-        setListHotels(hotels)
+    const handleGetHotels = async () =>{
+        const resListHotels = await Services(
+            {},   // body
+            config.api.hotels.list.url,       // url
+            config.api.hotels.list.method    // method, opcional
+        )
+
+        console.log(resListHotels);
+       // const hotels = GetHotels();
+        //setListHotels(hotels)
     }
 
     const handleOpenEditHotel= (id) => {
